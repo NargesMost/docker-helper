@@ -1,0 +1,31 @@
+name: Save TAR to Repo
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Pull PHP image
+        run: docker pull php:7.4-apache
+
+      - name: Save TAR
+        run: docker save php:7.4-apache -o php74-apache.tar
+
+      - name: Add TAR to repo
+        run: |
+          mkdir upload
+          mv php74-apache.tar upload/
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git add upload/php74-apache.tar
+          git commit -m "Add php74-apache.tar"
+          git push
