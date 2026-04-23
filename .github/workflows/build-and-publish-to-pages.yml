@@ -1,0 +1,32 @@
+name: Build PHP 7.4 Apache Image and Upload to GitHub Pages
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Login to Docker Hub (anonymous)
+        run: echo "Skipping login (public image)"
+
+      - name: Pull image
+        run: docker pull php:7.4-apache
+
+      - name: Save image as TAR
+        run: docker save php:7.4-apache -o php74-apache.tar
+
+      - name: Create gh-pages folder
+        run: |
+          mkdir gh-pages
+          mv php74-apache.tar gh-pages/
+
+      - name: Publish to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./gh-pages
