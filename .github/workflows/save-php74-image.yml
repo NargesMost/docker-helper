@@ -1,0 +1,24 @@
+name: Save PHP 7.4 Apache Image as TAR
+
+on:
+  workflow_dispatch:
+
+jobs:
+  save-image:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Login to DockerHub (anonymous)
+        run: echo "No login needed"
+
+      - name: Pull php:7.4-apache image
+        run: docker pull php:7.4-apache
+
+      - name: Save image to TAR
+        run: docker save php:7.4-apache -o php74-apache.tar
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: php74-apache
+          path: php74-apache.tar
