@@ -1,4 +1,4 @@
-name: Save PHP 7.4 Apache Image as TAR
+name: Save PHP 7.4 Apache Image as TAR (GitHub Releases)
 
 on:
   workflow_dispatch:
@@ -6,10 +6,12 @@ on:
 jobs:
   save-image:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
 
     steps:
-      - name: Login to DockerHub (anonymous)
-        run: echo "No login needed"
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
       - name: Pull php:7.4-apache image
         run: docker pull php:7.4-apache
@@ -17,8 +19,9 @@ jobs:
       - name: Save image to TAR
         run: docker save php:7.4-apache -o php74-apache.tar
 
-      - name: Upload artifact
-        uses: actions/upload-artifact@v4
+      - name: Create Release and upload TAR
+        uses: softprops/action-gh-release@v2
         with:
-          name: php74-apache
-          path: php74-apache.tar
+          tag_name: php74-apache
+          name: PHP 7.4 Apache TAR Image
+          files: php74-apache.tar
