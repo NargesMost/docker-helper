@@ -1,0 +1,32 @@
+name: Build PHP 7.4 Apache Image and Upload to GitHub Pages
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Pull image
+        run: docker pull php:7.4-apache
+
+      - name: Save image as TAR
+        run: docker save php:7.4-apache -o php74-apache.tar
+
+      - name: Prepare folder for GitHub Pages
+        run: |
+          mkdir public
+          mv php74-apache.tar public/
+
+      - name: Upload to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./public
