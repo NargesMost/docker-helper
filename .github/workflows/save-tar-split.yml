@@ -1,0 +1,39 @@
+name: Save TAR to Repo with Split
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Pull PHP image
+        run: docker pull php:7.4-apache
+
+      - name: Save TAR and check size
+        run: |
+          docker save php:7.4-apache -o php74-apache.tar
+          ls -lh php74-apache.tar
+
+      - name: Split TAR into 90MB parts
+        run: |
+          mkdir -p upload
+          split -b 90M php74-apache.tar upload/php74-apache.tar.part-
+
+      - name: List split files
+        run: ls -lh upload/
+
+      - name: Commit and push split parts
+        run: |
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git add upload/
+          git commit -m "Add php74-apache.tar split parts"
+          git push
